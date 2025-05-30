@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Weather Forecast</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <script>
+        // Function to get current location
+        function getWeatherByLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                alert("Geolocation is not supported by your browser.");
+            }
+        }
+
+        // When location is found successfully
+        function showPosition(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            fetch(`/api/weather/location?lat=${lat}&lon=${lon}`)
+                .then(response => response.json())
+                .then(data => {
+                    /*  let html = "<h2>Weather for Your Location</h2>";*/
+
+                    const weather = data.data.list[0];
+
+                    // h2 outside, box inside
+                    let html = `
+                <h2>Weather for Your Location</h2>
+                <div class="Box1">
+                    <h3><strong>${new Date().toLocaleString()}</strong></h3>
+                    <div class = "middle">
+                    <p>🌡️ Temp: <span class="highlight">${weather.main.temp}</span> °C</p>
+                    <p>💧 Humidity: <span>${weather.main.humidity}</span> %</p>
+                    <p>💨 Wind Speed: <span>${weather.wind.speed}</span> m/s</p>
+                    </div>
+                    <h3>⛅ Condition: <span>${weather.weather[0].main}</span> - 
+                    <span>${weather.weather[0].description}</span></h3>
+                    <hr>
+                </div>
+            `;
+                    document.getElementById("locationWeather").innerHTML = html;
+                })
+                .catch(error => {
+                    console.error("Error fetching location-based weather:", error);
+                    alert("Could not fetch weather for your location.");
+                });
+        }
+
+        function showError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("User denied the request for Geolocation.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    alert("The request to get user location timed out.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("An unknown error occurred.");
+                    break;
+            }
+        }
+    </script>
+</head>
+
+<body>
+
+    <h1>Weather Forecast App</h1>
+
+    <!-- Search Form -->
+    <div class="search-form">
+        <form th:action="@{/weather}" method="get">
+            <input type="text" name="city" placeholder="Enter city name" required class="search-input">
+            <button type="submit" class="submit-button">Get Weather</button>
+        </form>
+
+        <!-- Location Button -->
+        <button onclick="getWeatherByLocation()" class="location-button">📍 Get Weather for My Location</button>
+
+        <!-- Location Weather Results -->
+        <div id="locationWeather" style="margin-top: 20px;"></div>
+    </div>
+
+    <div class="container">
+        <!-- Weather Results for searched city -->
+        <div th:if="${weatherData != null}">
+            <h2 th:text="'Weather for ' + ${city}"></h2>
+        </div>
+    </div>
+
+    <div class="box-container">
+        <div class="box" th:each="data : ${weatherData.list}">
+            <p><strong th:text="${data.dt_txt}"></strong></p>
+            <p>🌡️ Temp: <span class="highlight" th:text="${data.main.temp}">25</span> °C</p>
+            <p>💧 Humidity: <span th:text="${data.main.humidity}">60</span> %</p>
+            <p>💨 Wind Speed: <span th:text="${data.wind.speed}">5</span> m/s</p>
+            <p class="condition">⛅ Condition: <span th:text="${data.weather[0].main}"></span> - <span
+                    th:text="${data.weather[0].description}"></span></p>
+            <hr>
+        </div>
+    </div>
+
+</body>
+
+</html>
