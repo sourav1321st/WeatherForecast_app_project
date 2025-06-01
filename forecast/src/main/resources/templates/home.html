@@ -15,6 +15,20 @@
             }
         }
 
+        function updateClock() {
+            const now = new Date();
+            const secondDeg = now.getSeconds() * 6;
+            const minuteDeg = now.getMinutes() * 6 + now.getSeconds() * 0.1;
+            const hourDeg = ((now.getHours() % 12) + now.getMinutes() / 60) * 30;
+
+            document.getElementById('second').style.transform = `rotate(${secondDeg}deg)`;
+            document.getElementById('minute').style.transform = `rotate(${minuteDeg}deg)`;
+            document.getElementById('hour').style.transform = `rotate(${hourDeg}deg)`;
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock(); // Initial call
+
         // When location is found successfully
         function showPosition(position) {
             const lat = position.coords.latitude;
@@ -23,9 +37,12 @@
             fetch(`/api/weather/location?lat=${lat}&lon=${lon}`)
                 .then(response => response.json())
                 .then(data => {
-                    /*  let html = "<h2>Weather for Your Location</h2>";*/
-
-                    const weather = data.data.list[0];
+                    const weatherList = data.data?.list;
+                    if (!weatherList || weatherList.length === 0) {
+                        alert("No weather data available for your location.");
+                        return;
+                    }
+                    const weather = weatherList[0];
 
                     // h2 outside, box inside
                     let html = `
@@ -33,9 +50,9 @@
                 <div class="Box1">
                     <h3><strong>${new Date().toLocaleString()}</strong></h3>
                     <div class = "middle">
-                    <p>🌡️ Temp: <span class="highlight">${weather.main.temp}</span> °C</p>
-                    <p>💧 Humidity: <span>${weather.main.humidity}</span> %</p>
-                    <p>💨 Wind Speed: <span>${weather.wind.speed}</span> m/s</p>
+                        <p>🌡️ Temp: <span class="highlight">${weather.main.temp}</span> °C</p>
+                        <p>💧 Humidity: <span>${weather.main.humidity}</span> %</p>
+                        <p>💨 Wind Speed: <span>${weather.wind.speed}</span> m/s</p>
                     </div>
                     <h3>⛅ Condition: <span>${weather.weather[0].main}</span> - 
                     <span>${weather.weather[0].description}</span></h3>
@@ -87,14 +104,19 @@
         <div id="locationWeather" style="margin-top: 20px;"></div>
     </div>
 
-    <div class="container">
-        <!-- Weather Results for searched city -->
-        <div th:if="${weatherData != null}">
-            <h2 th:text="'Weather for ' + ${city}"></h2>
-        </div>
+    <!-- Show error message if present -->
+    <div th:if="${error != null}">
+        <p style="color: red;" th:text="${error}"></p>
     </div>
 
-    <div class="box-container">
+    <!-- Show city name if available -->
+    <div class="container" th:if="${city != null}">
+        <h2 th:text="'Weather for ' + ${city}"></h2>
+    </div>
+
+    <!-- Show weather data if available and list is not empty -->
+    <div class="box-container"
+        th:if="${weatherData != null} and ${weatherData.list} != null and !${weatherData.list.isEmpty()}">
         <div class="box" th:each="data : ${weatherData.list}">
             <p><strong th:text="${data.dt_txt}"></strong></p>
             <p>🌡️ Temp: <span class="highlight" th:text="${data.main.temp}">25</span> °C</p>
@@ -105,6 +127,24 @@
             <hr>
         </div>
     </div>
+
+    <!-- Show message if no weather data and no error -->
+    <div th:if="${weatherData == null} and ${error == null}">
+        <p class="Welcome">Welcome to Weather forcast</p>
+        <p class="exception">Please enter a city name or use your location to see the weather forecast.</p>
+    </div>
+
+
+    <div class="top-left-clock">
+        <div class="clock">
+            <div class="hand hour" id="hour"></div>
+            <div class="hand minute" id="minute"></div>
+            <div class="hand second" id="second"></div>
+            <div class="center-circle"></div>
+        </div>
+    </div>
+
+
 
 </body>
 
