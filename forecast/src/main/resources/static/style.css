@@ -3,7 +3,7 @@ body {
     background-color: #002147;
     padding: 20px;
     /* Replace with your actual image name */
-    background-image: url("https://sdmntprwestus2.oaiusercontent.com/files/00000000-a61c-61f8-8bb7-e65687d8b9f6/raw?se=2025-05-30T21%3A05%3A59Z&sp=r&sv=2024-08-04&sr=b&scid=9b4c1a92-cc66-5c96-a55c-c69ab2d5c02a&skoid=789f404f-91a9-4b2f-932c-c44965c11d82&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-05-30T12%3A35%3A53Z&ske=2025-05-31T12%3A35%3A53Z&sks=b&skv=2024-08-04&sig=Kp2Jfnsk8uaKCht57PRe8eh/LqM3Redsee5uoWeQwE0%3D");
+    background-image: url("https://raw.githubusercontent.com/sourav1321st/WeatherForecast_app_project/9c2de841457e3b88cafcd0cae3567673755d95cb/forecast/src/main/resources/static/ChatGPT%20Image%20May%2031%2C%202025%2C%2002_46_03%20AM.png");
     /* Replace with your actual image name */
     background-size: cover;
     /* Ensures it covers the entire screen */
